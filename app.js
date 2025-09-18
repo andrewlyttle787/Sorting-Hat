@@ -88,6 +88,8 @@ let remainingPeople = [];
 let lastPicked = null;
 
 // DOM element queries (move to top)
+const uploadParticipantsInput = document.getElementById('upload-participants');
+const uploadFeedback = document.getElementById('upload-feedback');
 const draftPhaseSection = document.getElementById('draft-phase');
 const draftBoard = document.getElementById('draft-board');
 const draftRoundSpan = document.getElementById('draft-round');
@@ -140,6 +142,32 @@ function setPhase(phase) {
         peopleManagementSection.style.display = 'none';
     }
     // ...existing code...
+if (uploadParticipantsInput) {
+    uploadParticipantsInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const text = evt.target.result;
+            // Split by newlines or commas
+            let names = text.split(/\r?\n|,/).map(n => n.trim()).filter(n => n.length > 0);
+            // Always restore all names from file (remove duplicates)
+            const uniqueNames = Array.from(new Set(names));
+            let restoredCount = 0;
+            // Replace people array with all names from file
+            people.length = 0;
+            people.push(...uniqueNames);
+            restoredCount = uniqueNames.length;
+            showPopup(`${restoredCount} participant${restoredCount === 1 ? '' : 's'} restored from file.`);
+            renderPeople();
+            renderSetupLists();
+        };
+        reader.onerror = function() {
+            showPopup('Error reading file.');
+        };
+        reader.readAsText(file);
+    });
+}
 }
 
 function startDraft() {
@@ -307,7 +335,7 @@ function updateAllLists() {
 }
 
 // People management logic
-const people = [];
+let people = [];
 
 function renderPeople() {
 	personList.innerHTML = '';

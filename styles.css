@@ -1,3 +1,33 @@
+/* Upload area styles */
+.upload-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 18px 0;
+  padding: 10px 0;
+}
+
+.upload-label {
+  font-weight: 500;
+  color: #2a6ad7;
+  font-size: 1.08rem;
+}
+
+.upload-input {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #eaf1fb;
+  color: #174a9e;
+  font-size: 1rem;
+  border: 1px solid #b0c4de;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+}
+.upload-input:hover {
+  background: #dbeafe;
+  border-color: #2a6ad7;
+}
 /* ...existing code... */
 
 /* Button container for edit/remove */
