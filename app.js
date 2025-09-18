@@ -4,6 +4,7 @@ let draftAssignments = [];
 let draftRound = 1;
 let draftTeamTurn = 0;
 let remainingPeople = [];
+let lastPicked = null;
 
 // DOM element queries (move to top)
 const draftPhaseSection = document.getElementById('draft-phase');
@@ -39,24 +40,60 @@ function startDraft() {
 }
 
 function renderDraftBoard() {
-	draftBoard.innerHTML = '';
-	draftAssignments.forEach(team => {
-		const div = document.createElement('div');
-		div.style.marginBottom = '1em';
-		div.innerHTML = `<strong>${team.name}</strong>: ${team.members.join(', ')}`;
-		draftBoard.appendChild(div);
-	});
+    draftBoard.innerHTML = '';
+    draftAssignments.forEach(team => {
+        const card = document.createElement('div');
+        card.style.background = '#eaf1fb';
+        card.style.borderRadius = '8px';
+        card.style.marginBottom = '12px';
+        card.style.padding = '12px 16px';
+        card.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '6px';
+        const title = document.createElement('strong');
+        title.textContent = team.name;
+        title.style.fontSize = '1.1rem';
+        card.appendChild(title);
+        const membersList = document.createElement('ul');
+        membersList.style.listStyle = 'none';
+        membersList.style.padding = '0';
+        membersList.style.margin = '0';
+        team.members.forEach(member => {
+            const memberLi = document.createElement('li');
+            memberLi.textContent = member;
+            memberLi.style.padding = '4px 8px';
+            memberLi.style.borderRadius = '4px';
+            memberLi.style.marginBottom = '2px';
+            if (member === lastPicked) {
+                memberLi.style.background = '#2a6ad7';
+                memberLi.style.color = '#fff';
+                memberLi.style.fontWeight = 'bold';
+            } else {
+                memberLi.style.background = '#f7f9fc';
+            }
+            membersList.appendChild(memberLi);
+        });
+        card.appendChild(membersList);
+        draftBoard.appendChild(card);
+    });
 }
 
 function updateDraftUI() {
-	draftRoundSpan.textContent = `Round: ${draftRound}`;
-	draftTeamTurnSpan.textContent = ` | Team Turn: ${draftAssignments[draftTeamTurn].name}`;
-	remainingPeopleList.innerHTML = '';
-	remainingPeople.forEach(person => {
-		const li = document.createElement('li');
-		li.textContent = person;
-		remainingPeopleList.appendChild(li);
-	});
+    draftRoundSpan.textContent = `Round: ${draftRound}`;
+    draftRoundSpan.style.fontWeight = 'bold';
+    draftRoundSpan.style.color = '#2a6ad7';
+    draftRoundSpan.style.fontSize = '1.2rem';
+    draftTeamTurnSpan.textContent = ` | Team Turn: ${draftAssignments[draftTeamTurn].name}`;
+    draftTeamTurnSpan.style.fontWeight = 'bold';
+    draftTeamTurnSpan.style.color = '#d7263d';
+    draftTeamTurnSpan.style.fontSize = '1.2rem';
+    remainingPeopleList.innerHTML = '';
+    remainingPeople.forEach(person => {
+        const li = document.createElement('li');
+        li.textContent = person;
+        remainingPeopleList.appendChild(li);
+    });
 }
 
 function fairDistributionCounts(total, numTeams) {
@@ -67,38 +104,39 @@ function fairDistributionCounts(total, numTeams) {
 }
 
 function nextPick() {
-	if (remainingPeople.length === 0) {
-		nextPickBtn.disabled = true;
-		return;
-	}
-	// Determine fair team sizes
-	const teamSizes = fairDistributionCounts(people.length, teams.length);
-	// Only pick if team hasn't reached its fair size
-	while (draftAssignments[draftTeamTurn].members.length >= teamSizes[draftTeamTurn]) {
-		draftTeamTurn = (draftTeamTurn + 1) % teams.length;
-		if (draftAssignments.every((team, idx) => team.members.length >= teamSizes[idx])) {
-			nextPickBtn.disabled = true;
-			renderDraftBoard();
-			updateDraftUI();
-			return;
-		}
-	}
-	// Randomly select a participant
-	const randIdx = Math.floor(Math.random() * remainingPeople.length);
-	const selected = remainingPeople.splice(randIdx, 1)[0];
-	draftAssignments[draftTeamTurn].members.push(selected);
-	renderDraftBoard();
-	updateDraftUI();
-	// Advance team turn
-	draftTeamTurn = (draftTeamTurn + 1) % teams.length;
-	// If all assigned, disable button
-	if (remainingPeople.length === 0) {
-		nextPickBtn.disabled = true;
-	}
-	// If all teams have reached their fair size, end draft
-	if (draftAssignments.every((team, idx) => team.members.length >= teamSizes[idx])) {
-		nextPickBtn.disabled = true;
-	}
+    if (remainingPeople.length === 0) {
+        nextPickBtn.disabled = true;
+        return;
+    }
+    // Determine fair team sizes
+    const teamSizes = fairDistributionCounts(people.length, teams.length);
+    // Only pick if team hasn't reached its fair size
+    while (draftAssignments[draftTeamTurn].members.length >= teamSizes[draftTeamTurn]) {
+        draftTeamTurn = (draftTeamTurn + 1) % teams.length;
+        if (draftAssignments.every((team, idx) => team.members.length >= teamSizes[idx])) {
+            nextPickBtn.disabled = true;
+            renderDraftBoard();
+            updateDraftUI();
+            return;
+        }
+    }
+    // Randomly select a participant
+    const randIdx = Math.floor(Math.random() * remainingPeople.length);
+    const selected = remainingPeople.splice(randIdx, 1)[0];
+    draftAssignments[draftTeamTurn].members.push(selected);
+    lastPicked = selected;
+    renderDraftBoard();
+    updateDraftUI();
+    // Advance team turn
+    draftTeamTurn = (draftTeamTurn + 1) % teams.length;
+    // If all assigned, disable button
+    if (remainingPeople.length === 0) {
+        nextPickBtn.disabled = true;
+    }
+    // If all teams have reached their fair size, end draft
+    if (draftAssignments.every((team, idx) => team.members.length >= teamSizes[idx])) {
+        nextPickBtn.disabled = true;
+    }
 }
 
 startDraftBtn.addEventListener('click', startDraft);
@@ -340,6 +378,13 @@ renderPeople = function() {
     originalRenderPeople();
     renderSetupLists();
 };
+
+personForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    addPerson(personNameInput.value);
+    personNameInput.value = '';
+    renderSetupLists();
+});
 
 // Initial render (must be last)
 renderTeams();
