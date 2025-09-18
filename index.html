@@ -1,3 +1,25 @@
+  <section id="setup-phase">
+    <h2>Setup Phase</h2>
+    <div>
+      <strong>Teams:</strong>
+      <ul id="setup-team-list"></ul>
+    </div>
+    <div>
+      <strong>Participants:</strong>
+      <ul id="setup-person-list"></ul>
+    </div>
+    <button id="start-draft" disabled>Start Draft</button>
+    <p id="setup-error" style="color: red;"></p>
+  </section>
+  <section id="people-management">
+    <h2>People Management</h2>
+    <form id="person-form">
+      <input type="text" id="person-name" placeholder="Enter participant name" required />
+      <button type="submit">Add Participant</button>
+    </form>
+    <ul id="person-list"></ul>
+    <p id="person-error" style="color: red;"></p>
+  </section>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +30,15 @@
 </head>
 <body>
   <h1>Sorting Hat Draft Pick</h1>
-  <p>If you see this text styled, CSS is working.</p>
+  <section id="team-management">
+    <h2>Team Management</h2>
+    <form id="team-form">
+      <input type="text" id="team-name" placeholder="Enter team name" required />
+      <button type="submit">Add Team</button>
+    </form>
+    <ul id="team-list"></ul>
+    <p id="team-error" style="color: red;"></p>
+  </section>
   <script src="app.js"></script>
 </body>
 </html>
