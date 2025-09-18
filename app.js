@@ -5,12 +5,25 @@ let draftRound = 1;
 let draftTeamTurn = 0;
 let remainingPeople = [];
 
+// DOM element queries (move to top)
 const draftPhaseSection = document.getElementById('draft-phase');
 const draftBoard = document.getElementById('draft-board');
 const draftRoundSpan = document.getElementById('draft-round');
 const draftTeamTurnSpan = document.getElementById('draft-team-turn');
 const nextPickBtn = document.getElementById('next-pick');
 const remainingPeopleList = document.getElementById('remaining-people-list');
+const setupTeamList = document.getElementById('setup-team-list');
+const setupPersonList = document.getElementById('setup-person-list');
+const startDraftBtn = document.getElementById('start-draft');
+const setupError = document.getElementById('setup-error');
+const personForm = document.getElementById('person-form');
+const personNameInput = document.getElementById('person-name');
+const personList = document.getElementById('person-list');
+const personError = document.getElementById('person-error');
+const teamForm = document.getElementById('team-form');
+const teamNameInput = document.getElementById('team-name');
+const teamList = document.getElementById('team-list');
+const teamError = document.getElementById('team-error');
 
 function startDraft() {
 	draftActive = true;
@@ -91,10 +104,6 @@ function nextPick() {
 startDraftBtn.addEventListener('click', startDraft);
 nextPickBtn.addEventListener('click', nextPick);
 // Setup phase logic
-const setupTeamList = document.getElementById('setup-team-list');
-const setupPersonList = document.getElementById('setup-person-list');
-const startDraftBtn = document.getElementById('start-draft');
-const setupError = document.getElementById('setup-error');
 
 function renderSetupLists() {
     setupTeamList.innerHTML = '';
@@ -104,11 +113,17 @@ function renderSetupLists() {
         // Edit button
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editTeam(idx);
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            editTeam(idx);
+        };
         // Delete button
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Delete';
-        delBtn.onclick = () => deleteTeam(idx);
+        delBtn.onclick = function(e) {
+            e.stopPropagation();
+            deleteTeam(idx);
+        };
         li.appendChild(editBtn);
         li.appendChild(delBtn);
         setupTeamList.appendChild(li);
@@ -120,11 +135,17 @@ function renderSetupLists() {
         // Edit button
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editPerson(idx);
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            editPerson(idx);
+        };
         // Delete button
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Delete';
-        delBtn.onclick = () => deletePerson(idx);
+        delBtn.onclick = function(e) {
+            e.stopPropagation();
+            deletePerson(idx);
+        };
         li.appendChild(editBtn);
         li.appendChild(delBtn);
         setupPersonList.appendChild(li);
@@ -157,11 +178,6 @@ function updateAllLists() {
 // People management logic
 const people = [];
 
-const personForm = document.getElementById('person-form');
-const personNameInput = document.getElementById('person-name');
-const personList = document.getElementById('person-list');
-const personError = document.getElementById('person-error');
-
 function renderPeople() {
 	personList.innerHTML = '';
 	people.forEach((person, idx) => {
@@ -170,15 +186,41 @@ function renderPeople() {
 		// Edit button
 		const editBtn = document.createElement('button');
 		editBtn.textContent = 'Edit';
-		editBtn.onclick = () => editPerson(idx);
+		editBtn.onclick = function(e) {
+			e.stopPropagation();
+			editPerson(idx);
+		};
 		// Delete button
 		const delBtn = document.createElement('button');
 		delBtn.textContent = 'Delete';
-		delBtn.onclick = () => deletePerson(idx);
+		delBtn.onclick = function(e) {
+			e.stopPropagation();
+			deletePerson(idx);
+		};
 		li.appendChild(editBtn);
 		li.appendChild(delBtn);
 		personList.appendChild(li);
 	});
+}
+
+function showPopup(message) {
+    const popup = document.createElement('div');
+    popup.textContent = message;
+    popup.style.position = 'fixed';
+    popup.style.top = '24px';
+    popup.style.left = '50%';
+    popup.style.transform = 'translateX(-50%)';
+    popup.style.background = '#2a6ad7';
+    popup.style.color = '#fff';
+    popup.style.padding = '12px 32px';
+    popup.style.borderRadius = '8px';
+    popup.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+    popup.style.fontSize = '1.1rem';
+    popup.style.zIndex = '9999';
+    document.body.appendChild(popup);
+    setTimeout(() => {
+        popup.remove();
+    }, 1600);
 }
 
 function addPerson(name) {
@@ -194,6 +236,7 @@ function addPerson(name) {
     personError.textContent = '';
     renderPeople();
     renderSetupLists();
+    showPopup(`Participant "${name.trim()}" added!`);
 }
 
 function editPerson(idx) {
@@ -214,40 +257,35 @@ function deletePerson(idx) {
     renderSetupLists();
 }
 
-personForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    addPerson(personNameInput.value);
-    personNameInput.value = '';
-    renderSetupLists();
-});
 // Sorting Hat Draft Pick App
 // Team management logic
 console.log('Sorting Hat JS loaded');
 
 const teams = [];
 
-const teamForm = document.getElementById('team-form');
-const teamNameInput = document.getElementById('team-name');
-const teamList = document.getElementById('team-list');
-const teamError = document.getElementById('team-error');
-
 function renderTeams() {
-	teamList.innerHTML = '';
-	teams.forEach((team, idx) => {
-		const li = document.createElement('li');
-		li.textContent = team;
-		// Edit button
-		const editBtn = document.createElement('button');
-		editBtn.textContent = 'Edit';
-		editBtn.onclick = () => editTeam(idx);
-		// Delete button
-		const delBtn = document.createElement('button');
-		delBtn.textContent = 'Delete';
-		delBtn.onclick = () => deleteTeam(idx);
-		li.appendChild(editBtn);
-		li.appendChild(delBtn);
-		teamList.appendChild(li);
-	});
+    teamList.innerHTML = '';
+    teams.forEach((team, idx) => {
+        const li = document.createElement('li');
+        li.textContent = team;
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            editTeam(idx);
+        };
+        // Delete button
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = function(e) {
+            e.stopPropagation();
+            deleteTeam(idx);
+        };
+        li.appendChild(editBtn);
+        li.appendChild(delBtn);
+        teamList.appendChild(li);
+    });
 }
 
 function addTeam(name) {
@@ -263,6 +301,7 @@ function addTeam(name) {
     teamError.textContent = '';
     renderTeams();
     renderSetupLists();
+    showPopup(`Team "${name.trim()}" added!`);
 }
 
 function editTeam(idx) {
