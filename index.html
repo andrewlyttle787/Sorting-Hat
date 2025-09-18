@@ -1,25 +1,4 @@
-  <section id="setup-phase">
-    <h2>Setup Phase</h2>
-    <div>
-      <strong>Teams:</strong>
-      <ul id="setup-team-list"></ul>
-    </div>
-    <div>
-      <strong>Participants:</strong>
-      <ul id="setup-person-list"></ul>
-    </div>
-    <button id="start-draft" disabled>Start Draft</button>
-    <p id="setup-error" style="color: red;"></p>
-  </section>
-  <section id="people-management">
-    <h2>People Management</h2>
-    <form id="person-form">
-      <input type="text" id="person-name" placeholder="Enter participant name" required />
-      <button type="submit">Add Participant</button>
-    </form>
-    <ul id="person-list"></ul>
-    <p id="person-error" style="color: red;"></p>
-  </section>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,6 +17,41 @@
     </form>
     <ul id="team-list"></ul>
     <p id="team-error" style="color: red;"></p>
+  </section>
+  <section id="people-management">
+    <h2>People Management</h2>
+    <form id="person-form">
+      <input type="text" id="person-name" placeholder="Enter participant name" required />
+      <button type="submit">Add Participant</button>
+    </form>
+    <ul id="person-list"></ul>
+    <p id="person-error" style="color: red;"></p>
+  </section>
+  <section id="setup-phase">
+    <h2>Setup Phase</h2>
+    <div>
+      <strong>Teams:</strong>
+      <ul id="setup-team-list"></ul>
+    </div>
+    <div>
+      <strong>Participants:</strong>
+      <ul id="setup-person-list"></ul>
+    </div>
+    <button id="start-draft" disabled>Start Draft</button>
+    <p id="setup-error" style="color: red;"></p>
+  </section>
+  <section id="draft-phase" style="display:none;">
+    <h2>Draft Phase</h2>
+    <div id="draft-board"></div>
+    <div>
+      <span id="draft-round"></span>
+      <span id="draft-team-turn"></span>
+    </div>
+    <button id="next-pick" disabled>Next Pick</button>
+    <div>
+      <strong>Remaining Participants:</strong>
+      <ul id="remaining-people-list"></ul>
+    </div>
   </section>
   <script src="app.js"></script>
 </body>
