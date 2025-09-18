@@ -207,6 +207,34 @@ li button.remove-btn {
   background: #2a6ad7;
   color: #fff;
   font-weight: bold;
+  animation: pickHighlight 0.7s cubic-bezier(0.4,0.2,0.2,1);
+}
+
+@keyframes pickHighlight {
+  0% {
+    background: #f7f9fc;
+    color: #174a9e;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 0 #2a6ad7;
+  }
+  40% {
+    background: #2a6ad7;
+    color: #fff;
+    transform: scale(1.18);
+    box-shadow: 0 0 12px 2px #2a6ad7;
+  }
+  70% {
+    background: #2a6ad7;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 0 8px 1px #2a6ad7;
+  }
+  100% {
+    background: #2a6ad7;
+    color: #fff;
+    transform: scale(1);
+    box-shadow: none;
+  }
 }
 
 .draft-controls {
