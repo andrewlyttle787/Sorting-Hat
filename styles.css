@@ -1,3 +1,6 @@
+/* ...existing code... */
+
+/* Button container for edit/remove */
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
@@ -104,6 +107,49 @@ li {
   font-size: 1rem;
 }
 
+/* Button container for edit/remove */
+.person-list li, .team-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.person-list li > span,
+.team-list li > span {
+  flex: 1;
+}
+
+.person-list .btn-container,
+.team-list .btn-container {
+  display: flex;
+  gap: 8px;
+}
+
+.remove-btn {
+  background: #d7263d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background: #a81c2a;
+}
+
+button {
+  background: #2a6ad7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+button:not(.remove-btn):hover {
+  background: #1e4fa3;
+}
 li button {
   padding: 4px 10px;
   font-size: 0.95rem;
@@ -256,6 +302,19 @@ li button.remove-btn {
 }
 .draft-controls button:not(:disabled):hover {
   background: #174a9e;
+}
+
+#assign-all {
+  background: #2ad76a;
+  color: #fff;
+  margin-left: 16px;
+}
+#assign-all:disabled {
+  background: #b0b0b0;
+  color: #fff;
+}
+#assign-all:not(:disabled):hover {
+  background: #1e9e4a;
 }
 
 .remaining-participants {

@@ -93,6 +93,7 @@ const draftBoard = document.getElementById('draft-board');
 const draftRoundSpan = document.getElementById('draft-round');
 const draftTeamTurnSpan = document.getElementById('draft-team-turn');
 const nextPickBtn = document.getElementById('next-pick');
+const assignAllBtn = document.getElementById('assign-all');
 const remainingPeopleList = document.getElementById('remaining-people-list');
 const setupTeamList = document.getElementById('setup-team-list');
 const setupPersonList = document.getElementById('setup-person-list');
@@ -142,15 +143,18 @@ function setPhase(phase) {
 }
 
 function startDraft() {
-	draftActive = true;
-	draftAssignments = teams.map(team => ({ name: team, members: [] }));
-	draftRound = 1;
-	draftTeamTurn = 0;
-	remainingPeople = [...people];
-	setPhase('draft');
-	renderDraftBoard();
-	updateDraftUI();
-	nextPickBtn.disabled = false;
+    draftActive = true;
+    draftAssignments = teams.map(team => ({ name: team, members: [] }));
+    draftRound = 1;
+    draftTeamTurn = 0;
+    remainingPeople = [...people];
+    setPhase('draft');
+    renderDraftBoard();
+    updateDraftUI();
+    nextPickBtn.disabled = false;
+    if (assignAllBtn) {
+        assignAllBtn.disabled = false;
+    }
 }
 
 function renderDraftBoard() {
@@ -239,6 +243,29 @@ function nextPick() {
 
 startDraftBtn.addEventListener('click', startDraft);
 nextPickBtn.addEventListener('click', nextPick);
+if (assignAllBtn) {
+    assignAllBtn.addEventListener('click', function() {
+        // Assign all remaining participants in fair, random order
+        const teamSizes = fairDistributionCounts(people.length, teams.length);
+        while (remainingPeople.length > 0 && draftAssignments.some((team, idx) => team.members.length < teamSizes[idx])) {
+            // Find next team that still needs members
+            let teamIdx = draftAssignments.findIndex((team, idx) => team.members.length < teamSizes[idx]);
+            if (teamIdx === -1) break;
+            // Randomly select a participant
+            const randIdx = Math.floor(Math.random() * remainingPeople.length);
+            const selected = remainingPeople.splice(randIdx, 1)[0];
+            draftAssignments[teamIdx].members.push(selected);
+            lastPicked = selected;
+        }
+        renderDraftBoard();
+        updateDraftUI();
+        nextPickBtn.disabled = true;
+        if (assignAllBtn) {
+            assignAllBtn.disabled = true;
+        }
+        endDraftAndShowResults();
+    });
+}
 // Setup phase logic
 
 function renderSetupLists() {
@@ -285,28 +312,37 @@ const people = [];
 function renderPeople() {
 	personList.innerHTML = '';
 	people.forEach((person, idx) => {
-		const li = document.createElement('li');
-		const nameSpan = document.createElement('span');
-		nameSpan.textContent = person;
-		// Edit button
-		const editBtn = document.createElement('button');
-		editBtn.textContent = 'Edit';
-		editBtn.onclick = function(e) {
-			e.stopPropagation();
-			editPerson(idx);
-		};
-		// Delete button
-		const delBtn = document.createElement('button');
-		delBtn.textContent = 'Delete';
-		delBtn.className = 'remove-btn';
-		delBtn.onclick = function(e) {
-			e.stopPropagation();
-			deletePerson(idx);
-		};
-		li.appendChild(nameSpan);
-		li.appendChild(editBtn);
-		li.appendChild(delBtn);
-		personList.appendChild(li);
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
+        li.style.justifyContent = 'space-between';
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = person;
+        nameSpan.style.flex = '1';
+        // Button container
+        const btnContainer = document.createElement('div');
+        btnContainer.style.display = 'flex';
+        btnContainer.style.gap = '8px';
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            editPerson(idx);
+        };
+        // Delete button
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.className = 'remove-btn';
+        delBtn.onclick = function(e) {
+            e.stopPropagation();
+            deletePerson(idx);
+        };
+        btnContainer.appendChild(editBtn);
+        btnContainer.appendChild(delBtn);
+        li.appendChild(nameSpan);
+        li.appendChild(btnContainer);
+        personList.appendChild(li);
 	});
 }
 
@@ -375,7 +411,15 @@ function renderTeams() {
     teams.forEach((team, idx) => {
         const li = document.createElement('li');
         const nameSpan = document.createElement('span');
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
+        li.style.justifyContent = 'space-between';
         nameSpan.textContent = team;
+        nameSpan.style.flex = '1';
+        // Button container
+        const btnContainer = document.createElement('div');
+        btnContainer.style.display = 'flex';
+        btnContainer.style.gap = '8px';
         // Edit button
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
@@ -391,9 +435,10 @@ function renderTeams() {
             e.stopPropagation();
             deleteTeam(idx);
         };
+        btnContainer.appendChild(editBtn);
+        btnContainer.appendChild(delBtn);
         li.appendChild(nameSpan);
-        li.appendChild(editBtn);
-        li.appendChild(delBtn);
+        li.appendChild(btnContainer);
         teamList.appendChild(li);
     });
 }
