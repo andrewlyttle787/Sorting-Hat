@@ -1,3 +1,84 @@
+// Results phase Back to Setup button logic
+const resultsBackToSetupBtn = document.getElementById('results-back-to-setup');
+if (resultsBackToSetupBtn) {
+    resultsBackToSetupBtn.addEventListener('click', function() {
+        setPhase('setup');
+        renderTeams();
+        renderPeople();
+        renderSetupLists();
+        startDraftBtn.disabled = teams.length < 2 || people.length < 2;
+    });
+}
+// Back to Setup button logic
+const backToSetupBtn = document.getElementById('back-to-setup');
+if (backToSetupBtn) {
+    backToSetupBtn.addEventListener('click', function() {
+        setPhase('setup');
+        renderTeams();
+        renderPeople();
+        renderSetupLists();
+        startDraftBtn.disabled = teams.length < 2 || people.length < 2;
+    });
+}
+const resultsPhaseSection = document.getElementById('results-phase');
+const resultsBoard = document.getElementById('results-board');
+const restartDraftBtn = document.getElementById('restart-draft');
+
+function showResultsPhase() {
+    draftPhaseSection.style.display = 'none';
+    resultsPhaseSection.style.display = '';
+    renderResultsBoard();
+}
+
+function renderResultsBoard() {
+    resultsBoard.innerHTML = '';
+    draftAssignments.forEach(team => {
+        const card = document.createElement('div');
+        card.style.background = '#eaf1fb';
+        card.style.borderRadius = '8px';
+        card.style.marginBottom = '12px';
+        card.style.padding = '12px 16px';
+        card.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '6px';
+        const title = document.createElement('strong');
+        title.textContent = team.name;
+        title.style.fontSize = '1.1rem';
+        card.appendChild(title);
+        const membersList = document.createElement('ul');
+        membersList.style.listStyle = 'none';
+        membersList.style.padding = '0';
+        membersList.style.margin = '0';
+        team.members.forEach(member => {
+            const memberLi = document.createElement('li');
+            memberLi.textContent = member;
+            memberLi.style.padding = '4px 8px';
+            memberLi.style.borderRadius = '4px';
+            memberLi.style.marginBottom = '2px';
+            memberLi.style.background = '#f7f9fc';
+            membersList.appendChild(memberLi);
+        });
+        card.appendChild(membersList);
+        resultsBoard.appendChild(card);
+    });
+}
+
+function endDraftAndShowResults() {
+    showResultsPhase();
+}
+
+restartDraftBtn.addEventListener('click', function() {
+    // Reset draft data and immediately start a new draft with same teams/participants
+    draftAssignments = [];
+    draftActive = false;
+    draftRound = 1;
+    draftTeamTurn = 0;
+    remainingPeople = [];
+    lastPicked = null;
+    setPhase('draft');
+    startDraft();
+});
 // Draft logic & automated process
 let draftActive = false;
 let draftAssignments = [];
@@ -25,6 +106,40 @@ const teamForm = document.getElementById('team-form');
 const teamNameInput = document.getElementById('team-name');
 const teamList = document.getElementById('team-list');
 const teamError = document.getElementById('team-error');
+const setupPhaseSection = document.getElementById('setup-phase');
+const phaseIndicator = document.getElementById('phase-indicator');
+
+function setPhase(phase) {
+    setupPhaseSection.style.display = 'none';
+    draftPhaseSection.style.display = 'none';
+    resultsPhaseSection.style.display = 'none';
+    const setupSection = document.getElementById('setup-phase');
+    const draftSection = document.getElementById('draft-phase');
+    const resultsSection = document.getElementById('results-phase');
+    const teamManagementSection = document.getElementById('team-management');
+    const peopleManagementSection = document.getElementById('people-management');
+
+    if (phase === 'draft') {
+        setupSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+        draftSection.style.display = 'block';
+        teamManagementSection.style.display = 'none';
+        peopleManagementSection.style.display = 'none';
+    } else if (phase === 'setup') {
+        setupSection.style.display = 'block';
+        draftSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+        teamManagementSection.style.display = '';
+        peopleManagementSection.style.display = '';
+    } else if (phase === 'results') {
+        setupSection.style.display = 'none';
+        draftSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+        teamManagementSection.style.display = 'none';
+        peopleManagementSection.style.display = 'none';
+    }
+    // ...existing code...
+}
 
 function startDraft() {
 	draftActive = true;
@@ -32,8 +147,7 @@ function startDraft() {
 	draftRound = 1;
 	draftTeamTurn = 0;
 	remainingPeople = [...people];
-	setupPhaseSection.style.display = 'none';
-	draftPhaseSection.style.display = '';
+	setPhase('draft');
 	renderDraftBoard();
 	updateDraftUI();
 	nextPickBtn.disabled = false;
@@ -43,34 +157,16 @@ function renderDraftBoard() {
     draftBoard.innerHTML = '';
     draftAssignments.forEach(team => {
         const card = document.createElement('div');
-        card.style.background = '#eaf1fb';
-        card.style.borderRadius = '8px';
-        card.style.marginBottom = '12px';
-        card.style.padding = '12px 16px';
-        card.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.gap = '6px';
+        // Use new styles from CSS
         const title = document.createElement('strong');
         title.textContent = team.name;
-        title.style.fontSize = '1.1rem';
         card.appendChild(title);
         const membersList = document.createElement('ul');
-        membersList.style.listStyle = 'none';
-        membersList.style.padding = '0';
-        membersList.style.margin = '0';
         team.members.forEach(member => {
             const memberLi = document.createElement('li');
             memberLi.textContent = member;
-            memberLi.style.padding = '4px 8px';
-            memberLi.style.borderRadius = '4px';
-            memberLi.style.marginBottom = '2px';
             if (member === lastPicked) {
-                memberLi.style.background = '#2a6ad7';
-                memberLi.style.color = '#fff';
-                memberLi.style.fontWeight = 'bold';
-            } else {
-                memberLi.style.background = '#f7f9fc';
+                memberLi.classList.add('picked');
             }
             membersList.appendChild(memberLi);
         });
@@ -129,13 +225,15 @@ function nextPick() {
     updateDraftUI();
     // Advance team turn
     draftTeamTurn = (draftTeamTurn + 1) % teams.length;
-    // If all assigned, disable button
+    // If all assigned, disable button and show results
     if (remainingPeople.length === 0) {
         nextPickBtn.disabled = true;
+        endDraftAndShowResults();
     }
-    // If all teams have reached their fair size, end draft
+    // If all teams have reached their fair size, end draft and show results
     if (draftAssignments.every((team, idx) => team.members.length >= teamSizes[idx])) {
         nextPickBtn.disabled = true;
+        endDraftAndShowResults();
     }
 }
 
@@ -145,47 +243,15 @@ nextPickBtn.addEventListener('click', nextPick);
 
 function renderSetupLists() {
     setupTeamList.innerHTML = '';
-    teams.forEach((team, idx) => {
+    teams.forEach((team) => {
         const li = document.createElement('li');
         li.textContent = team;
-        // Edit button
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = function(e) {
-            e.stopPropagation();
-            editTeam(idx);
-        };
-        // Delete button
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = function(e) {
-            e.stopPropagation();
-            deleteTeam(idx);
-        };
-        li.appendChild(editBtn);
-        li.appendChild(delBtn);
         setupTeamList.appendChild(li);
     });
     setupPersonList.innerHTML = '';
-    people.forEach((person, idx) => {
+    people.forEach((person) => {
         const li = document.createElement('li');
         li.textContent = person;
-        // Edit button
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = function(e) {
-            e.stopPropagation();
-            editPerson(idx);
-        };
-        // Delete button
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = function(e) {
-            e.stopPropagation();
-            deletePerson(idx);
-        };
-        li.appendChild(editBtn);
-        li.appendChild(delBtn);
         setupPersonList.appendChild(li);
     });
     validateSetup();
@@ -220,7 +286,8 @@ function renderPeople() {
 	personList.innerHTML = '';
 	people.forEach((person, idx) => {
 		const li = document.createElement('li');
-		li.textContent = person;
+		const nameSpan = document.createElement('span');
+		nameSpan.textContent = person;
 		// Edit button
 		const editBtn = document.createElement('button');
 		editBtn.textContent = 'Edit';
@@ -231,10 +298,12 @@ function renderPeople() {
 		// Delete button
 		const delBtn = document.createElement('button');
 		delBtn.textContent = 'Delete';
+		delBtn.className = 'remove-btn';
 		delBtn.onclick = function(e) {
 			e.stopPropagation();
 			deletePerson(idx);
 		};
+		li.appendChild(nameSpan);
 		li.appendChild(editBtn);
 		li.appendChild(delBtn);
 		personList.appendChild(li);
@@ -305,7 +374,8 @@ function renderTeams() {
     teamList.innerHTML = '';
     teams.forEach((team, idx) => {
         const li = document.createElement('li');
-        li.textContent = team;
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = team;
         // Edit button
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
@@ -316,10 +386,12 @@ function renderTeams() {
         // Delete button
         const delBtn = document.createElement('button');
         delBtn.textContent = 'Delete';
+        delBtn.className = 'remove-btn';
         delBtn.onclick = function(e) {
             e.stopPropagation();
             deleteTeam(idx);
         };
+        li.appendChild(nameSpan);
         li.appendChild(editBtn);
         li.appendChild(delBtn);
         teamList.appendChild(li);
@@ -390,3 +462,4 @@ personForm.addEventListener('submit', function(e) {
 renderTeams();
 renderPeople();
 renderSetupLists();
+setPhase('setup');
